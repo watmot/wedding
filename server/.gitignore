@@ -1,2 +1,9 @@
 # dependencies
 node_modules
+
+# database
+*.db
+*.rdb
+
+# misc
+.env
