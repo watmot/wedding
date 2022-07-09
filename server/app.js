@@ -14,10 +14,11 @@ const redisClient = new Redis();
 const sess = {
   store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET,
-  resave: false,
+  resave: true, // Setting resave and rolling means the cookie will be refreshed
+  rolling: true, // on subequent requests, stopping the user's session ending during usage.
   saveUninitialized: false,
   cookie: {
-    maxAge: 60 * 60 * 1000,
+    maxAge: 60 * 60 * 1000, // Cookie expires after 1h, unless refreshed (see above).
     secure: process.env.NODE_ENV === 'production'
   }
 };
