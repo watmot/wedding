@@ -31,7 +31,7 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser((id, cb) => {
   process.nextTick(() => {
     db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
-      const userInfo = { username: row.username };
+      const userInfo = { username: row.username, role: row.role };
       cb(err, userInfo);
     });
   });
@@ -39,15 +39,15 @@ passport.deserializeUser((id, cb) => {
 
 // Router Setup
 router.post('/register', (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
   db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
     if (err) return next(err);
     if (row) return res.status(409).send({ message: 'User already exists.' });
 
     bcrypt.hash(password, 10).then((hash) => {
       db.run(
-        'INSERT INTO users (username, hashed_password) VALUES (?, ?)',
-        [username, hash],
+        'INSERT INTO users (username, hashed_password, role) VALUES (?, ?, ?)',
+        [username, hash, role],
         (err) => {
           if (err) next(err);
           res.status(201).send({ message: 'User successfully created.' });
@@ -60,11 +60,12 @@ router.post('/register', (req, res, next) => {
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
-    if (!user) return res.status(401).send(info);
+    if (!user) return res.status(401).json(info);
 
     req.login(user, (err) => {
       if (err) return next(err);
-      res.send({ message: 'Successfully authenticated.', ...req.user });
+      const { username, role } = req.user;
+      res.json({ message: 'User successfully authenticated.', role, username });
     });
   })(req, res, next);
 });
@@ -72,16 +73,16 @@ router.post('/login', (req, res, next) => {
 router.post('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
-    res.send({ message: 'Successfully logged out.' });
+    res.json({ message: 'User successfully logged out.' });
   });
 });
 
 router.get('/user', (req, res) => {
-  res.send(req.user);
+  res.json(req.user);
 });
 
 router.get('/session', (req, res) => {
-  res.send(req.session);
+  res.json(req.session);
 });
 
 module.exports = router;

@@ -11,7 +11,8 @@ db.serialize(function () {
     'CREATE TABLE IF NOT EXISTS users ( \
     id INTEGER PRIMARY KEY, \
     username TEXT UNIQUE, \
-    hashed_password BLOB \
+    hashed_password BLOB, \
+    role TEXT \
   )'
   );
 });
