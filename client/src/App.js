@@ -1,104 +1,73 @@
-import { useEffect, useState } from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import axios from 'axios';
+import Accomodation from './components/pages/Accomodation';
+import Admin from './components/pages/Admin';
+import Gifts from './components/pages/Gifts';
+import Itinerary from './components/pages/Itinerary';
+import Location from './components/pages/Location';
+import Login from './components/pages/Login';
+import Navigation from './components/Navigation';
+import RequireAuth from './routing/RequireAuth';
+import Rsvp from './components/pages/Rsvp';
 
 function App() {
-  const [registerUsername, setRegisterUsername] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [loginUsername, setLoginUsername] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [user, setUser] = useState(null);
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    handleGetUser();
-    handleGetSession();
-  }, []);
-
-  function handleRegister() {
-    axios({
-      method: 'post',
-      data: {
-        username: registerUsername,
-        password: registerPassword
-      },
-      withCredentials: true,
-      url: 'http://localhost:5000/auth/register'
-    })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err.response.data));
-  }
-
-  function handleLogin() {
-    axios({
-      method: 'post',
-      data: {
-        username: loginUsername,
-        password: loginPassword
-      },
-      withCredentials: true,
-      url: 'http://localhost:5000/auth/login'
-    })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err.response.data));
-  }
-
-  function handleLogout() {
-    axios({
-      method: 'post',
-      withCredentials: true,
-      url: 'http://localhost:5000/auth/logout'
-    })
-      .then((res) => console.log(res))
-      .catch((err) => console.error(err.response.data));
-  }
-
-  function handleGetUser() {
-    axios({
-      method: 'get',
-      withCredentials: true,
-      url: 'http://localhost:5000/auth/user'
-    })
-      .then((res) => setUser(res))
-      .catch((err) => console.error(err.response.data));
-  }
-
-  function handleGetSession() {
-    axios({
-      method: 'get',
-      withCredentials: true,
-      url: 'http://localhost:5000/auth/session'
-    })
-      .then((res) => setSession(res))
-      .catch((err) => console.error(err.response.data));
-  }
-
   return (
     <div className="App">
-      <div>
-        <h1>Register</h1>
-        <input placholder="username" onChange={(e) => setRegisterUsername(e.target.value)} />
-        <input placholder="password" onChange={(e) => setRegisterPassword(e.target.value)} />
-        <button onClick={handleRegister}>Submit</button>
-      </div>
-      <div>
-        <h1>Login</h1>
-        <input placholder="username" onChange={(e) => setLoginUsername(e.target.value)} />
-        <input placholder="password" onChange={(e) => setLoginPassword(e.target.value)} />
-        <button onClick={handleLogin}>Submit</button>
-      </div>
-      <div>
-        <h1>Logout</h1>
-        <button onClick={handleLogout}>Submit</button>
-      </div>
-      <div>
-        <button onClick={handleGetUser}>Get User</button>
-        <h2>{JSON.stringify(user?.data)}</h2>
-      </div>
-      <div>
-        <button onClick={handleGetSession}>Get Session</button>
-        <h2>{JSON.stringify(session?.data)}</h2>
-      </div>
+      <Router>
+        <Navigation />
+
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth admin={true}>
+                <Admin />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/rsvp"
+            element={
+              <RequireAuth>
+                <Rsvp />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/location"
+            element={
+              <RequireAuth>
+                <Location />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/accomodation"
+            element={
+              <RequireAuth>
+                <Accomodation />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/itinerary"
+            element={
+              <RequireAuth>
+                <Itinerary />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/gifts"
+            element={
+              <RequireAuth>
+                <Gifts />
+              </RequireAuth>
+            }
+          />
+        </Routes>
+      </Router>
     </div>
   );
 }
