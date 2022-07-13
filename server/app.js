@@ -47,6 +47,15 @@ app.disable('x-powered-by');
 const auth = require('./routes/auth');
 app.use('/auth', auth);
 
+const invitees = require('./routes/invitees');
+app.use('/invitees', invitees);
+
+const houses = require('./routes/houses');
+app.use('/houses', houses);
+
+const rooms = require('./routes/rooms');
+app.use('/rooms', rooms);
+
 // Start Server
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
